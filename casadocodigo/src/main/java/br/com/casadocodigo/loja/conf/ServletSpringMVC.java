@@ -1,6 +1,8 @@
 package br.com.casadocodigo.loja.conf;
 
 import javax.servlet.Filter;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletRegistration.Dynamic;
 
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
@@ -41,6 +43,22 @@ public class ServletSpringMVC extends AbstractAnnotationConfigDispatcherServletI
 		filter.setEncoding("utf8");
 		
 		return new Filter[] {filter};
+		
+	}
+	
+	/**
+	 * Metodo para customizar o registro de arquivos (MultiPart).
+	 */
+	
+	@Override
+	protected void customizeRegistration(Dynamic registration) {
+		//Criando objeto de configuracao de Multipart.
+		//Neste caso, nao quero nenhuma configuracao. 
+		//Por isso, passarei uma string vazia como parametro no MultiPartConfigElement.
+		MultipartConfigElement multipartConfigElement = new MultipartConfigElement("");
+		
+		//Setando as configuracoes
+		registration.setMultipartConfig(multipartConfigElement);
 		
 	}
 

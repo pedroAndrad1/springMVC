@@ -31,6 +31,8 @@ public class Produto {
 	@DateTimeFormat 
 	private Calendar dataLancamento;
 	
+	//O atributo sumarioPath tera o caminho do arquivo sumario na banco (Nesse caso, uma pasta no projeto)
+	private String sumarioPath;
 	
 	
 	public Calendar getDataLancamento() {
@@ -72,6 +74,12 @@ public class Produto {
 	@Override
 	public String toString() {
 		return "Produto [titulo=" + titulo + ", descricao=" + descricao + ", paginas=" + paginas + "]";
+	}
+	public String getSumarioPath() {
+		return sumarioPath;
+	}
+	public void setSumarioPath(String sumarioPath) {
+		this.sumarioPath = sumarioPath;
 	}
 	
 	

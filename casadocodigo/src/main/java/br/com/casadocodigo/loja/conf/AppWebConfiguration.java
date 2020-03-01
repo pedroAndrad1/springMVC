@@ -8,11 +8,16 @@ import org.springframework.format.datetime.DateFormatter;
 import org.springframework.format.datetime.DateFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import br.com.casadocodigo.loja.controllers.HomeController;
 import br.com.casadocodigo.loja.daos.ProdutosDAO;
+import br.com.casadocodigo.loja.infra.FileSaver;
 
 /**
  * Essa classe tem o objetivo de configurar o que tange a assusntos web, como onde estao as classes de modelo, de 
@@ -23,9 +28,18 @@ import br.com.casadocodigo.loja.daos.ProdutosDAO;
 
 @EnableWebMvc
 //Anotacao para o springMVC saber em quais pacotes estao as classes
-@ComponentScan(basePackageClasses= {HomeController.class, ProdutosDAO.class}) 
-public class AppWebConfiguration {
+@ComponentScan(basePackageClasses= {HomeController.class, ProdutosDAO.class, FileSaver.class})
+//Estou extendendo a classe WebMvcConfigurerAdapter para poder acessar a pasta webapp/resources/ com o CSS e imagens
+public class AppWebConfiguration extends WebMvcConfigurerAdapter {
 	
+	/**
+	 * Metodo para permitir o acesso a pasta webapp/resources/ com o CSS e imagens.
+	 */
+	@Override
+	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+		// TODO Auto-generated method stub
+		configurer.enable();
+	}
 	/**
 	 * Metodo para setar quais sao os prefixos e sufixos dos arquivos jsp.
 	 * @return
@@ -78,5 +92,14 @@ public class AppWebConfiguration {
 		
 		return conversionService;
 	}
-
+	
+	/**
+	 * Indica para o springMVC qual o resolver de arquivos do tipo MultiPart. Ou seja, qual classe ira lidar com arquivos
+	 * jpg, pdf etc.
+	 * @return
+	 */
+	@Bean
+	public MultipartResolver multipartResolver() {
+		return new StandardServletMultipartResolver();
+	}
 }

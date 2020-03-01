@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!-- A taglib tags/form serve para usarmos as features do spring em nosso form -->
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<!-- A taglib tags nos auxiliara em evitar ficar mexendo no form do usuarioa por meio de algumas variaveis -->
+<!-- A taglib tags nos auxiliara em evitar ficar mexendo no form do usuario por meio de algumas variaveis -->
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s"%>
 <!DOCTYPE html>
 <html>
@@ -12,8 +12,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-	
-	<form action="/casadocodigo/produtos" method="POST">
+	<!-- O atributo enctype = multipart/form-data e para permitir o form enviar files do tipo multipart (pdf, jpg etc) -->
+	<form action="/casadocodigo/produtos" method="POST" enctype="multipart/form-data">
 		<div>
 			<label>Título</label> 
 			<form:input path="produto.titulo"/>
@@ -49,7 +49,10 @@
 			<form:hidden path="produto.precos[${status.index}].tipo" value = "${tipoPreco}" />
 
 		</c:forEach>
-
+		<div>
+			<label>Sumário</label>
+			<input type="file" name="sumario"/>
+		</div>
 
 		<button type="submit">Cadastrar</button>
 	</form>

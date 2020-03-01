@@ -9,12 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.com.casadocodigo.loja.daos.ProdutosDAO;
+import br.com.casadocodigo.loja.infra.FileSaver;
 import br.com.casadocodigo.loja.models.Produto;
 import br.com.casadocodigo.loja.models.TipoPreco;
 import br.com.casadocodigo.loja.validation.ProdutoValidation;
@@ -28,7 +31,29 @@ public class ProdutosController {
 		@Autowired
 		private ProdutosDAO produtosDAO;
 		
+		@Autowired //O spring instancia pra mim
+		private FileSaver fileSaver;
 		
+		
+		/**
+		 * Recebe o hhtp request com o endereco produtos/detalhe com um id passado com o parametro e retorna a jsp detalhe
+		 * customizado para o produto com o mesmo id no banco.
+		 * @param id
+		 * @return
+		 */
+		//anotacao para esse metodo ser chamado ao receber um http request deste endereco. O /{id} e o @PathVariable("id")
+		//sao para nao ficar um ?parametro id na url
+		@RequestMapping("/detalhe/{îd}") 
+		public ModelAndView detalhe(@PathVariable("id") Integer id) {
+				ModelAndView modelAndView = new ModelAndView("detalhe");
+				//Pegando produto
+				Produto produto = produtosDAO.find(id);
+				//Pendurando produto
+				modelAndView.addObject("produto",  produto);
+				
+				return modelAndView;
+				
+		}
 		/**
 		 * Recebe o hhtp request com o endereco produtos/form e retorna a jsp form.	
 		 * @return
@@ -56,12 +81,18 @@ public class ProdutosController {
 		//anotacao para esse metodo ser chamado ao receber um http request deste endereco
 		@RequestMapping(method = RequestMethod.POST)
 		//A anotacao @valid e para o SringMVC validar o Produto, o resultado tem que ser o parametro seguinte
-		public ModelAndView gravar(@Valid Produto produto, BindingResult result, RedirectAttributes redirecAttributes) {
+		public ModelAndView gravar(MultipartFile sumario,@Valid Produto produto, BindingResult result, 
+								   RedirectAttributes redirecAttributes) {
 			//Checando se teve erro
 			if(result.hasErrors()) {
 				//mandando dnv para o form
 				return form(produto);
 			}
+			//Salvando o sumario no banco(nesse caso uma pasta no projeto)
+			String path = fileSaver.write("arquivos-sumario", sumario);
+			
+			//setando o caminho relativo do sumario do produto no produto
+			produto.setSumarioPath(path);
 			
 			System.out.println(produto);
 			this.produtosDAO.gravar(produto);

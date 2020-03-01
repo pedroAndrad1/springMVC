@@ -10,10 +10,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.web.servlet.ModelAndView;
 
 import br.com.casadocodigo.loja.models.Produto;
 
@@ -39,8 +39,38 @@ public class ProdutosDAO {
 		Query query = em.createQuery("select p from Produto p");
 		
 		//Pegando o resultado da Query
-		List<Produto> produtos = query.getResultList();
+		List<Produto> produtos =(List<Produto>) query.getResultList();
 		
 		return produtos;
+	}
+	
+	
+	/**
+	 * Retorna um Produto do banco a partir de um Id.
+	 * @param id
+	 * @return
+	 */
+	public Produto find(Integer id) {
+		/*Nao posso simplesmente fazer um em.find() pois ele nao carregaria os precos junto com o Produto. Isso acontece por 
+		 *causa do LazyLoad, a lista de precos so seria carregada do banco quando fosse acessada. O que nao podera ser feito da
+		 *JSP. Por isso, vou usar o JPQL para fazer um select mais rebuscado. 
+		 *
+		 * Atencao a alguns termos chave na query:
+		 * 
+		 * - distinct: para nao trazer resultados repetidos;
+		 * - join : para juntar a tabela de produtos com a tabela de precos relacionada;
+		 * - fetch (depois do join!): para carregar os precos junto com o produto;
+		 *   */
+		
+		//criando a query
+		TypedQuery<Produto> query = em.createQuery("select distinct(p) from Produto p join fetch p.precos where p.id = :id", Produto.class);
+		
+		//setando os parametros
+		query.setParameter("id",id);
+		
+		//pegando o resultado unico
+		Produto produto = query.getSingleResult();
+		
+		return produto;
 	}
 }
